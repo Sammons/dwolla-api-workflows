@@ -130,9 +130,9 @@ function refreshToken(func) {
 
     helpers.post(helpers.oauthHost() + "/v2/token", data, function (err, res, body) {
         logger.info("request to server for refreshed token", data, "responded with", body)
-        if (err) return logger.warn(err);
+        if (err) { func(err) ;return logger.warn(err); }
         var body = JSON.parse(body);
-        if (body.error) return logger.warn(body);
+        if (body.error) { func(body); return logger.warn(body); }
         else for (var k in body) helpers.save(k, body[k]);
         func()
     });
