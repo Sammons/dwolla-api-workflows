@@ -56,7 +56,7 @@ app.get("/oauth_button_path", function(req,res) {
 app.get("/oauth", function(req, res) {
     var code = req.query.code;
     goGrabTokenWithCode(code, function(token, refresh, expire_time) {
-        storage.save("access_token", token, function() {
+        helpers.save("access_token", token, function() {
             res.redirect("/#work");
         })
     })
