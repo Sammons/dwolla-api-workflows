@@ -47,7 +47,7 @@ var scopes = [
 app.get("/oauth_button_path", function(req,res) {
     res.send(
         helpers.oauthHost() + 
-        "/v2/authenticate?redirect_url=" + conf.redirect_uri +
+        "/v2/authenticate?redirect_uri=" + conf.oauth_redirect +
         "&client_id=" + 
         encodeURIComponent(conf.key) + 
         "&response_type=code&scope=" + scopes.join("|"));
@@ -104,7 +104,7 @@ function goGrabTokenWithCode(code, func) {
                 client_secret: conf.secret,
                 code: code,
                 grant_type: "authorization_code",
-                redirect_uri: conf.redirect_uri
+                redirect_uri: conf.oauth_redirect
             }
         };
 
