@@ -13,6 +13,7 @@ Also - the workflows are strongly tailored to whitelabel dwolla api users, since
 * get node.js on your system if you haven't got it. (https://nodejs.org/en/download/)
 * `npm install`
 * `node app`
+* A web page should appear in your default browser, by default the app will direct you through a UAT flow, which means you don't need to input real data.
 
 #Configurations
 
