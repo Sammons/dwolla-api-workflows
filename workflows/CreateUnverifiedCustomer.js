@@ -1,5 +1,6 @@
 var helpers = require("../lib/helpers.js");
 
+module.exports.initial = true;
 module.exports.description = "Creates a customer that can receive money once a funding source is created.";
 module.exports.nextSteps = [
     "CreateFundingSourceForCustomer"
