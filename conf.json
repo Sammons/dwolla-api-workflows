@@ -1,0 +1,7 @@
+{
+	"key" : "jcts8NYPzEZOWMsGFuKnJwxpxkhKLUpZPV5CVeEHlv3gJ3K4O3",
+    "secret" : "VBDlBFSvHmjnlA1D7vuzqAyQoFN69pecsMlxLsm0p1eC2UxrEr",
+    "oauth_redirect" : "http://localhost:5000/oauth",
+    "port" : "5000",
+	"host" : "localhost:17188"
+}

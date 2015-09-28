@@ -1,0 +1,32 @@
+{
+  "name": "dwolla-api-workflows",
+  "version": "1.0.0",
+  "description": "runs through request flows on the dwolla v2 api",
+  "main": "app.js",
+  "dependencies": {
+    "async": "^1.4.2",
+    "bunyan": "^1.5.1",
+    "express": "^4.13.3",
+    "jfs": "^0.2.6",
+    "open": "0.0.5",
+    "request": "^2.64.0",
+    "sillyname": "0.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ben Sammons",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sammons/dwolla-api-workflows.git"
+  },
+  "keywords": [
+    "dwolla"
+  ],
+  "bugs": {
+    "url": "https://github.com/Sammons/dwolla-api-workflows/issues"
+  },
+  "homepage": "https://github.com/Sammons/dwolla-api-workflows#readme"
+}

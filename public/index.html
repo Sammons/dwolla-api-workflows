@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Dwolla api v2 workflows</title>
+    <style type="text/css">
+    .targetable {
+        display: none;
+    }
+    .targetable:target {
+        display: block;
+    }
+    .show-grid [class=col-md-12] {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        background-color: #eee;
+        background-color: rgba(86,61,124,.15);
+        border: 1px solid #ddd;
+        border: 1px solid rgba(86,61,124,.2);
+    }
+    .show-grid [class=col-md-12]:hover {
+      background-color: rgba(86,61,124,.10);
+    }
+    #work .col {
+      border: 1px solid rgba(86,61,124,.2);
+    }
+    #work .show-grid {
+      height: 800px;
+    }
+    </style>
+  </head>
+<body>
+    <nav class="navbar navbar-inverse">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#start">Dwolla API V2 Workflows</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container targetable" id="start">
+
+      <div class="starter-template">
+        <h1>Welcome</h1>
+        <p class="lead">Before anything else, we need an oAuth Token. Please click the button below to get a fresh token.</p>
+        <p class="lead">This token lets a program act on the behalf of the user - in this case that's you.</p>
+        <a type="button" class="btn btn-lg btn-primary js-set-oauth" href="#">Get Token</a>
+      </div>
+
+    </div><!-- /.container -->
+
+    <div class="container targetable col-md-12" id="work">
+      <div class="col col-md-4 droppable js-available js-die-for-play">
+        <div class="row">
+         <h2>Available</h2>
+         <span>drag steps to center, and see what you can do from there!</span>
+        </div>
+        <div class="js-available-container show-grid js-land">
+        </div>
+      </div>
+      <div class="col col-md-4 droppable js-play js-die-for-play">
+        <div class="row">
+        <h2>Current Workflow <span class="glyphicon glyphicon-play js-play-icon"/></h2>
+        </div>
+        <div class="js-selected-container show-grid js-land">
+        </div>
+      </div>
+      <div class="col col-md-4 js-expand-for-play">
+        <div class="row">
+        <h2 class="js-play-title">Play</h2>
+        </div>
+        <div class="js-play-container show-grid">
+        </div>
+      </div>
+    </div>
+
+
+    <div class="container targetable" id="templates">
+      <div class="row js-available-step draggable">
+        <div class="col-md-12">
+          <h3 class="js-step-title"></h3>
+          <span class="js-step-description"></span>
+          <input type="hidden" class="js-step-data">
+        </div>
+      </div>
+
+      <div class="js-play-step-result col-md-12">
+        <h3 class="js-play-step-name"></h3>
+        <div class="col-md-6"><h4>Requests</h4></div>
+        <div class="col-md-6"><h4>Responses</h4></div>
+        <div class="js-play-step-result-container">
+        </div>
+      </div>
+
+      <div class="js-play-step-substep col-md-12">
+        <div class="js-play-step-request col-md-6"></div>
+        <div class="js-play-step-result col-md-6"></div>
+      </div>
+    </div><!-- /.container -->    
+</body>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<link rel="stylesheet" href="/pretty-json.css">
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+<script src="/underscore.min.js"></script>
+<script src="/backbone-min.js"></script>
+<script src="/pretty-json.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+    function constructWorkflowRowAsAvailable(workflow) {
+      var availableStep = $("#templates .js-available-step").clone();
+      availableStep.find(".js-step-title").text(workflow.name);
+      availableStep.find(".js-step-description").text(workflow.description);
+      availableStep.find(".js-step-data").val(JSON.stringify(workflow.next));
+      availableStep.draggable();
+      availableStep.appendTo(".js-available-container");
+    }
+
+    function copyWorkflowStep(item) {
+      var step = $("#templates .js-available-step").clone();
+      step.find(".js-step-title").text(item.find(".js-step-title").text());
+      step.find(".js-step-description").text(item.find(".js-step-description").text());
+      step.find(".js-step-data").val(item.find(".js-step-data").val());
+      return step;
+    }
+
+    function getExistingAvailableNamesAsObj() {
+      var o = {};
+      $(".js-available-container").children().each(function(i, e) {
+        console.log(e,i)
+        o[$(e).find(".js-step-title").text()] = true;
+      })
+      return o;
+    }
+
+    function loadNextAvailableSteps(item) {
+      console.log('loading')
+      var name = item.find(".js-step-title").text();
+      var alreadyAvailable = getExistingAvailableNamesAsObj();
+      $.get("/nextSteps?fromStep="+name, function(body, status) {
+        console.log(body, status)
+        console.log(alreadyAvailable)
+        body.forEach(function(e, i) {
+          if (!alreadyAvailable[e.name])
+            constructWorkflowRowAsAvailable(e);
+        })
+      })
+    }
+
+    function getNamesOfSelectedSteps() {
+      var o = [];
+      $(".js-selected-container").children().each(function(i, e) {
+        o.push($(e).find(".js-step-title").text())
+      })
+      console.log(o)
+      return o;
+    }
+
+    function appendSubStepsToResult(name, result, steps) {
+      steps = JSON.parse(steps);
+      console.log(steps.length)
+      var template = $("#templates .js-play-step-substep");
+      for (var i = 0; i < steps.length; ++i) { 
+        var e = steps[i];
+        console.log(e)
+        var step = template.clone();
+        console.log(step)
+        try {
+          if (e.request.body) 
+            e.request.body = JSON.parse(e.request.body)
+        }
+        catch(e) {
+          console.log(e)
+        }
+        var jsonReq = new PrettyJSON.view.Node({
+          data: e.request, el: step.children(".js-play-step-request")[0] 
+        });
+        console.log(jsonReq);
+        var jsonRes = new PrettyJSON.view.Node({
+          data: e.response, el: step.children(".js-play-step-result")[0]
+        })
+        step.appendTo(result.find(".js-play-step-result-container"));
+      }
+    }
+
+    function addResultOfStepExecution(name, steps) {
+      var result = $("#templates .js-play-step-result").clone();
+      result.find(".js-play-step-name").text(name);
+      result.appendTo(".js-play-container");
+      appendSubStepsToResult(name, result, steps);
+    }
+
+    function play() {
+      var namesOfThingsToPlay = getNamesOfSelectedSteps();
+      var requestExecution = function(name, cb) {
+        $.get("/play?step="+name, function(body, status) {
+          addResultOfStepExecution(name, body)
+          if (!body.error) {
+            cb()
+          }
+        })
+      }
+
+      var done = function() {
+        requestExecution(namesOfThingsToPlay.shift(), done)
+      }
+
+      done();
+    }
+
+    $.get("/oauth_button_path", function(body, status) { $(".js-set-oauth").prop("href", body); });
+    $.get("/initialSteps", function(body, status) {
+      body.forEach(function(e,i) {
+        constructWorkflowRowAsAvailable(e);
+      })
+    });
+
+    $(".js-play.droppable").droppable({
+      drop: function( event, ui ) { 
+        var clone = copyWorkflowStep(ui.draggable).draggable();
+        ui.draggable.remove();
+
+        clone.appendTo(".js-selected-container");
+        loadNextAvailableSteps(clone);
+      }
+    });
+
+    $(".js-available.droppable").droppable({
+      drop: function( event, ui ) { 
+        var clone = copyWorkflowStep(ui.draggable).draggable();
+        ui.draggable.remove();
+        clone.appendTo(".js-available-container");
+      }
+    });
+
+    $(".glyphicon-play").click(function(e) {
+      console.log("play")
+      play();
+      e.preventDefault();
+      var icon = $(".js-play-icon");
+      $("<span>Reload the page to build a new workflow</span>").appendTo($(".js-play-title").parent())
+      $(".js-die-for-play").remove();
+      $(".js-expand-for-play").removeClass("col-md-4").addClass("col-md-12");
+      icon.remove();
+    })
+})
+</script>
+</html>
